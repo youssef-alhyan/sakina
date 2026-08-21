@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title> سكينة| Sakina - تحفيظ القرآن الكريم بروايتي ورش وحفص</title>
+
+    <!-- Primary SEO -->
+    <meta
+      name="description"
+      content="سكينة – تطبيق ويب لتحفيظ القرآن الكريم بروايتي ورش عن نافع وحفص عن عاصم، مع تلاوات مرتّلة وإمكانية التكرار والتنقل بين الآيات والصفحات والأجزاء."
+    />
+    <meta
+      name="keywords"
+      content="تحفيظ القرآن, ورش عن نافع, حفص عن عاصم, القرآن الكريم, تلاوة, استماع القرآن, sakina, سكينة, حفظ القرآن, مصحف, الخط المغربي"
+    />
+    <meta name="author" content="سكينة | Sakina" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://sakina.page.gd" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sakina.page.gd" />
+    <meta
+      property="og:title"
+      content="سكينة | Sakina - تحفيظ القرآن الكريم"
+    />
+    <meta
+      property="og:description"
+      content="استمع إلى القرآن الكريم بروايتي ورش وحفص مع إمكانية التكرار والتنقل بين الآيات والصفحات والأجزاء. تجربة تحفيظ متكاملة في متصفحك."
+    />
+    <meta
+      property="og:image"
+      content="https://sakina.page.gd/assets/imgs/logo.webp"
+    />
+    <meta property="og:locale" content="ar_AR" />
+    <meta property="og:site_name" content="سكينة | Sakina" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:url" content="https://sakina.page.gd" />
+    <meta
+      name="twitter:title"
+      content="سكينة | Sakina - تحفيظ القرآن الكريم"
+    />
+    <meta
+      name="twitter:description"
+      content="استمع إلى القرآن الكريم بروايتي ورش وحفص مع إمكانية التكرار والتنقل بين الآيات والصفحات والأجزاء."
+    />
+    <meta
+      name="twitter:image"
+      content="https://sarayan.pages.dev/assets/imgs/logo.webp"
+    />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "سكينة | Sakina",
+        "url": "https://sakina.page.gd",
+        "description": "تطبيق ويب لتحفيظ القرآن الكريم بروايتي ورش عن نافع وحفص عن عاصم، مع تلاوات مرتّلة وإمكانية التكرار والتنقل بين الآيات والصفحات والأجزاء.",
+        "applicationCategory": "EducationApplication",
+        "inLanguage": "ar",
+        "isAccessibleForFree": true,
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript"
+      }
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/imgs/favicon.ico" />
+
+    <!-- Bootstrap RTL CSS -->
+    <link href="assets/css/bootstrap.rtl.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css" />
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="assets/js/bootstrap.bundle.min.js" defer></script>
+  </head>
+
+  <body>
+    <div class="app-shell">
+
+      <!-- ── Sidebar Offcanvas ── -->
+      <div
+        class="offcanvas offcanvas-start"
+        tabindex="-1"
+        id="offcanvasSidebar"
+        aria-labelledby="offcanvasSidebarLabel"
+      >
+        <div class="offcanvas-header">
+          <img
+            src="assets/imgs/logo.webp"
+            alt="سكينة"
+            height="36"
+            id="offcanvasSidebarLabel"
+            class="sidebar-logo"
+          />
+
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="offcanvas-body">
+
+          <!-- Navigation -->
+          <div class="sidebar-section">
+            <div class="sidebar-section-title">
+              <i class="bi bi-compass"></i> التنقل
+            </div>
+
+            <div class="mb-2">
+              <label for="surah-select" class="form-label">السورة</label>
+              <select id="surah-select" class="form-select"></select>
+            </div>
+
+            <div class="mb-2">
+              <label for="juz-select" class="form-label">الجزء</label>
+              <select id="juz-select" class="form-select"></select>
+            </div>
+
+            <div class="mb-2">
+              <label for="page-select" class="form-label">الصفحة</label>
+              <select id="page-select" class="form-select"></select>
+            </div>
+
+            <div>
+              <label for="ayah-select" class="form-label">الآية</label>
+              <select id="ayah-select" class="form-select"></select>
+            </div>
+          </div>
+
+          <!-- Recitation -->
+          <div class="sidebar-section">
+            <div class="sidebar-section-title">
+              <i class="bi bi-mic"></i> التلاوة
+            </div>
+
+            <div class="mb-2">
+              <label for="riwaya-select" class="form-label">الرواية</label>
+              <select id="riwaya-select" class="form-select">
+                <option value="warsh">ورش عن نافع</option>
+                <option value="hafs">حفص عن عاصم</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="reciter-select" class="form-label">القارئ</label>
+              <select id="reciter-select" class="form-select">
+                <option value="">اختر القارئ</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Playback Settings -->
+          <div class="sidebar-section">
+            <div class="sidebar-section-title">
+              <i class="bi bi-sliders"></i> التشغيل
+            </div>
+
+            <div class="mb-2">
+              <label for="speed-control" class="form-label">
+                سرعة التشغيل
+              </label>
+
+              <select id="speed-control" class="form-select">
+                <option value="0.5">0.5x</option>
+                <option value="0.75">0.75x</option>
+                <option value="1" selected>1x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+                <option value="2">2x</option>
+              </select>
+            </div>
+
+            <div class="mb-2">
+              <label for="repeat-control" class="form-label">
+                التكرار
+              </label>
+
+              <select id="repeat-control" class="form-select">
+                <option value="1" selected>مرة واحدة</option>
+                <option value="2">مرتين</option>
+                <option value="4">أربع مرات</option>
+                <option value="5">خمس مرات</option>
+                <option value="infinite">دائماً</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="play-mode" class="form-label">
+                وضع التشغيل
+              </label>
+
+              <select id="play-mode" class="form-select">
+                <option value="aya" selected>آية</option>
+                <option value="page">صفحة</option>
+                <option value="sura">سورة</option>
+                <option value="juz">جزء</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Display Settings -->
+          <div class="sidebar-section">
+            <div class="sidebar-section-title">
+              <i class="bi bi-type"></i> العرض
+            </div>
+
+            <div>
+              <label for="font-size-control" class="form-label">
+                حجم الخط
+              </label>
+
+              <select id="font-size-control" class="form-select">
+                <option value="20">صغير جداً</option>
+                <option value="24">صغير</option>
+                <option value="28" selected>متوسط</option>
+                <option value="32">كبير</option>
+                <option value="36">كبير جداً</option>
+                <option value="40">ضخم</option>
+              </select>
+            </div>
+
+            <div style="margin-top: 10px">
+              <button
+                class="theme-toggle-btn"
+                id="theme-toggle-btn"
+                onclick="toggleTheme()"
+              >
+                <span
+                  id="theme-toggle-label"
+                  style="display: flex; align-items: center; gap: 7px"
+                >
+                  <i
+                    class="bi bi-moon-stars-fill"
+                    id="theme-icon"
+                  ></i>
+
+                  <span id="theme-text">الوضع الليلي</span>
+                </span>
+
+                <div class="theme-toggle-track"></div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Playback Controls -->
+          <div class="sidebar-section">
+            <div class="sidebar-section-title">
+              <i class="bi bi-play-circle"></i> التحكم
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-bottom: 10px">
+              <button
+                id="play-btn"
+                class="btn-custom"
+                style="flex: 1"
+              >
+                <i class="bi bi-play-fill"></i> تشغيل
+              </button>
+
+              <button
+                id="pause-btn"
+                class="btn-custom btn-secondary"
+                style="flex: 1"
+              >
+                <i class="bi bi-pause-fill"></i> إيقاف مؤقت
+              </button>
+            </div>
+
+            <button
+              id="stop-btn"
+              class="btn-custom btn-secondary"
+            >
+              <i class="bi bi-stop-fill"></i> إيقاف
+            </button>
+
+            <div style="margin-top: 12px">
+              <audio
+                id="audio-player"
+                class="w-100"
+                controls
+              ></audio>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Main Content ── -->
+      <main class="main-content">
+
+        <!-- Header -->
+        <div class="header">
+          <div class="header-inner">
+
+            <button id="prev-page" class="nav-btn">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+
+            <div class="header-title-block">
+              <div id="sura-title"></div>
+              <div id="page-info"></div>
+
+              <button
+                id="riwaya-badge"
+                class="riwaya-badge"
+                onclick="cycleRiwaya()"
+                title="تغيير الرواية"
+              >
+                ورش
+              </button>
+            </div>
+
+            <button id="next-page" class="nav-btn">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Quran Text -->
+        <div class="quran-text-container">
+          <div class="quran-text-inner">
+            <div
+              id="quran-text"
+              class="quran-text"
+            ></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- ── Bottom Controls Bar ── -->
+    <div
+      class="bottom-controls"
+      id="bottom-controls"
+    >
+
+      <div
+        class="audio-progress-strip"
+        id="audio-progress-strip"
+      >
+        <div
+          class="audio-progress-strip__fill"
+          id="audio-progress-fill"
+        ></div>
+      </div>
+
+      <button
+        class="ctrl-btn speed-btn"
+        onclick="changeSpeed(-1)"
+        title="تقليل السرعة"
+      >
+        <i class="bi bi-dash-lg"></i>
+      </button>
+
+      <span
+        class="speed-label"
+        id="bottom-speed-label"
+      >
+        1x
+      </span>
+
+      <button
+        class="ctrl-btn speed-btn"
+        onclick="changeSpeed(1)"
+        title="زيادة السرعة"
+      >
+        <i class="bi bi-plus-lg"></i>
+      </button>
+
+      <div class="ctrl-divider"></div>
+
+      <button
+        class="ctrl-btn"
+        onclick="bottomNavPrevSurah()"
+        title="السورة السابقة"
+      >
+        <i class="bi bi-chevron-double-right"></i>
+      </button>
+
+      <button
+        class="ctrl-btn"
+        onclick="bottomNavPrev()"
+        title="الآية السابقة"
+      >
+        <i class="bi bi-skip-end-fill"></i>
+      </button>
+
+      <button
+        class="ctrl-btn ctrl-btn--primary"
+        onclick="bottomPlayPause()"
+        id="bottom-play-pause"
+        title="تشغيل / إيقاف مؤقت"
+      >
+        <i
+          class="bi bi-play-fill"
+          id="bottom-play-icon"
+        ></i>
+      </button>
+
+      <button
+        class="ctrl-btn"
+        onclick="stopAudio()"
+        title="إيقاف"
+      >
+        <i class="bi bi-stop-fill"></i>
+      </button>
+
+      <button
+        class="ctrl-btn"
+        onclick="bottomNavNext()"
+        title="الآية التالية"
+      >
+        <i class="bi bi-skip-start-fill"></i>
+      </button>
+
+      <button
+        class="ctrl-btn"
+        onclick="bottomNavNextSurah()"
+        title="السورة التالية"
+      >
+        <i class="bi bi-chevron-double-left"></i>
+      </button>
+
+    </div>
+
+    <!-- ── Warsh Info Modal ── -->
+    <div
+      class="modal fade"
+      id="warshInfoModal"
+      tabindex="-1"
+      aria-labelledby="warshInfoModalLabel"
+      aria-hidden="true"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+      >
+        <div class="modal-content">
+
+          <div class="modal-header warsh-modal-header">
+            <h5
+              class="modal-title"
+              id="warshInfoModalLabel"
+            >
+              تنبيه حول الخط المغربي
+            </h5>
+          </div>
+
+          <div class="modal-body d-flex flex-column gap-3">
+
+            <div class="warsh-card">
+
+              <h6
+                class="warsh-card-title d-flex align-items-center gap-2 fw-bold fs-6 mb-2"
+              >
+                <span class="warsh-dot warsh-dot-brown"></span>
+                الخط في ورش — لماذا يبدو مختلفاً؟
+              </h6>
+
+              <p
+                class="warsh-text mb-3"
+                style="line-height: 1.9"
+              >
+                يعتمد هذا الموقع الخطَّ
+                <strong style="color: var(--gold-light)">
+                  العثماني المغربي
+                </strong>
+                لعرض نص ورش، وهو خط أصيل له قواعد مختلفة عن الخط المشرقي
+                المعهود:
+              </p>
+
+              <div class="row g-2 mb-2">
+
+                <div class="col-12 col-sm-4">
+                  <div class="warsh-letter-card text-center py-3 px-1">
+                    <div class="warsh-letter-demo warsh-font">
+                      ڧ
+                    </div>
+                    <div class="warsh-letter-label mt-1">
+                      قاف بنقطة واحدة فوق
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-sm-4">
+                  <div class="warsh-letter-card text-center py-3 px-1">
+                    <div class="warsh-letter-demo warsh-font">
+                      ڢ
+                    </div>
+                    <div class="warsh-letter-label mt-1">
+                      فاء بنقطة واحدة تحت
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-sm-4">
+                  <div class="warsh-letter-card text-center py-3 px-1">
+                    <div class="warsh-letter-demo warsh-font">
+                      ن
+                    </div>
+                    <div class="warsh-letter-label mt-1">
+                      نون في آخر الكلمة بدون نقطة أحياناً
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="warsh-card warsh-card-trust">
+
+              <h6
+                class="warsh-card-title d-flex align-items-center gap-2 fw-bold fs-6 mb-2"
+              >
+                <span class="warsh-dot warsh-dot-gold"></span>
+                مصدر الخط
+              </h6>
+
+              <p
+                class="warsh-text mb-0"
+                style="line-height: 1.9"
+              >
+                الخط المستخدم مقدَّم من
+
+                <a
+                  href="https://qurancomplex.gov.sa/quran-dev/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="warsh-link fw-bold"
+                >
+                  مجمع الملك فهد لطباعة المصحف الشريف
+                </a>
+              </p>
+
+            </div>
+
+          </div>
+
+          <div
+            class="modal-footer warsh-modal-footer d-flex flex-wrap gap-2 justify-content-between align-items-center"
+          >
+
+            <div
+              class="d-flex flex-column gap-1 flex-grow-1 warsh-progress-wrapper"
+            >
+              <div class="warsh-progress-track">
+                <div
+                  class="warsh-progress-bar"
+                  id="warshProgressBar"
+                ></div>
+              </div>
+
+              <span
+                class="warsh-timer-label"
+                id="warshTimerLabel"
+              >
+                انتظر
+                <span id="warshCountdown">5</span>ث
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="warsh-close-btn disabled"
+              id="warshCloseBtn"
+              data-bs-dismiss="modal"
+            >
+              فهمتُ، أكمل القراءة
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── About Modal ── -->
+    <div
+      class="modal fade"
+      id="aboutModal"
+      tabindex="-1"
+      aria-labelledby="aboutModalLabel"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+      >
+
+        <div class="modal-content">
+
+          <div class="modal-header">
+
+            <h5
+              class="modal-title"
+              id="aboutModalLabel"
+            >
+              عن سكينة
+            </h5>
+
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              style="filter: invert(1) opacity(0.6)"
+            ></button>
+
+          </div>
+
+          <div class="modal-body d-flex flex-column gap-3">
+
+            <!-- About -->
+            <div class="about-card">
+
+              <p class="about-text mb-0">
+                سكينة تطبيق ويب مفتوح المصدر لقراءة القرآن الكريم
+                والاستماع إليه لتسهيل الحفظ والمراجعة بروايتي
+
+                <strong style="color: var(--gold-light)">
+                  ورش عن نافع
+                </strong>
+
+                و
+
+                <strong style="color: var(--gold-light)">
+                  حفص عن عاصم
+                </strong>.
+              </p>
+
+            </div>
+
+            <!-- Report -->
+            <div class="about-card about-card-report">
+
+              <div class="about-card-title d-flex align-items-center gap-2">
+                <i class="bi bi-flag-fill"></i>
+                لاحظتَ خطأً؟
+              </div>
+
+              <p class="about-text mb-3">
+                إذا وجدتَ خطأً في النص أو الصوت أو أي جانب آخر،
+                لا تتردد في إخبارنا.
+              </p>
+
+              <button
+                type="button"
+                class="about-report-btn"
+                data-bs-dismiss="modal"
+                data-bs-toggle="modal"
+                data-bs-target="#reportModal"
+                onclick="prefillReportModal()"
+              >
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                أبلغ عن خطأ
+              </button>
+
+            </div>
+
+            <!-- Contact -->
+            <div class="about-card">
+
+              <div class="about-card-title d-flex align-items-center gap-2">
+                <i class="bi bi-person-lines-fill"></i>
+                تواصل معي
+              </div>
+
+              <ul
+                class="about-text mb-0 ps-0 list-unstyled"
+                style="line-height: 2.4"
+              >
+
+                <!-- Facebook -->
+                <li>
+                  <a
+                    href="https://www.facebook.com/ywsf.alhyan.171756"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="about-link"
+                  >
+                    <i class="bi bi-facebook me-2"></i>
+                    Facebook
+                  </a>
+                </li>
+
+                <!-- Instagram -->
+                <li>
+                  <a
+                    href="https://www.instagram.com/_youssefalhyane_"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="about-link"
+                  >
+                    <i class="bi bi-instagram me-2"></i>
+                    Instagram
+                  </a>
+                </li>
+
+                <!-- WhatsApp -->
+                <li>
+                  <a
+                    href="https://wa.me/212774828583"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="about-link"
+                  >
+                    <i class="bi bi-whatsapp me-2"></i>
+                    WhatsApp
+                  </a>
+                </li>
+
+              </ul>
+
+            </div>
+
+            <!-- Sources -->
+            <div class="about-card">
+
+              <div class="about-card-title d-flex align-items-center gap-2">
+                <i class="bi bi-heart-fill"></i>
+                المصادر
+              </div>
+
+              <ul
+                class="about-text mb-0 ps-0 list-unstyled"
+                style="line-height: 2"
+              >
+
+                <li>
+                  النص والخطوط:
+
+                  <a
+                    href="https://qurancomplex.gov.sa/quran-dev/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="about-link"
+                  >
+                    مجمع الملك فهد
+                  </a>
+                </li>
+
+                <li>
+                  القراء:
+
+                  <a
+                    href="https://www.versebyversequran.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="about-link"
+                  >
+                    VerseByVerseQuran.com
+                  </a>,
+
+                  <a
+                    href="https://everyayah.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="about-link"
+                  >
+                    EveryAyah.com
+                  </a>,
+
+                  <a
+                    href="https://mp3quran.net/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="about-link"
+                  >
+                    mp3Quran.net
+                  </a>,
+
+                  <a
+                    href="https://quranpedia.net/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="about-link"
+                  >
+                    QuranPedia.net
+                  </a>
+
+                </li>
+
+              </ul>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Report Error Modal ── -->
+    <div
+      class="modal fade"
+      id="reportModal"
+      tabindex="-1"
+      aria-labelledby="reportModalLabel"
+      aria-hidden="true"
+    >
+
+      <div
+        class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+      >
+
+        <div class="modal-content">
+
+          <div class="modal-header report-modal-header">
+
+            <h5
+              class="modal-title d-flex align-items-center gap-2"
+              id="reportModalLabel"
+            >
+
+              <i
+                class="bi bi-exclamation-triangle-fill"
+                style="color: #f08080"
+              ></i>
+
+              أبلغ عن خطأ
+
+            </h5>
+
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              style="filter: invert(1) opacity(0.6)"
+            ></button>
+
+          </div>
+
+          <div class="modal-body">
+
+            <form id="reportForm" novalidate>
+
+              <div class="mb-3">
+
+                <label
+                  for="r-email"
+                  class="report-label"
+                >
+                  <i class="bi bi-envelope-fill me-1"></i>
+                  البريد الإلكتروني *
+                </label>
+
+                <input
+                  type="email"
+                  id="r-email"
+                  class="report-input"
+                  placeholder="example@email.com"
+                  required
+                  dir="ltr"
+                />
+
+                <div
+                  class="report-field-error"
+                  id="err-email"
+                ></div>
+
+              </div>
+
+              <div class="row g-3 mb-3">
+
+                <div class="col-12 col-sm-5">
+
+                  <label
+                    for="r-type"
+                    class="report-label"
+                  >
+                    <i class="bi bi-tag-fill me-1"></i>
+                    نوع الرسالة *
+                  </label>
+
+                  <select
+                    id="r-type"
+                    class="report-input"
+                    required
+                    style="cursor: pointer"
+                  >
+
+                    <option
+                      value=""
+                      disabled
+                      selected
+                    >
+                      اختر...
+                    </option>
+
+                    <option value="error_report">
+                      إبلاغ عن خطأ
+                    </option>
+
+                    <option value="suggestion">
+                      اقتراح
+                    </option>
+
+                    <option value="notes">
+                      ملاحظة
+                    </option>
+
+                  </select>
+
+                  <div
+                    class="report-field-error"
+                    id="err-type"
+                  ></div>
+
+                </div>
+
+                <div class="col-12 col-sm-7">
+
+                  <label
+                    for="r-subject"
+                    class="report-label"
+                  >
+                    <i class="bi bi-card-heading me-1"></i>
+                    عنوان الموضوع *
+                  </label>
+
+                  <input
+                    type="text"
+                    id="r-subject"
+                    class="report-input"
+                    placeholder="ملخص قصير"
+                    required
+                  />
+
+                  <div
+                    class="report-field-error"
+                    id="err-subject"
+                  ></div>
+
+                </div>
+
+              </div>
+
+              <div class="mb-3">
+
+                <label
+                  for="r-riwaya"
+                  class="report-label"
+                >
+                  <i class="bi bi-mic-fill me-1"></i>
+                  الرواية *
+                </label>
+
+                <select
+                  id="r-riwaya"
+                  class="report-input"
+                  required
+                  style="cursor: pointer"
+                >
+
+                  <option
+                    value=""
+                    disabled
+                    selected
+                  >
+                    اختر الرواية...
+                  </option>
+
+                  <option value="warsh">
+                    ورش عن نافع
+                  </option>
+
+                  <option value="hafs">
+                    حفص عن عاصم
+                  </option>
+
+                </select>
+
+                <div
+                  class="report-field-error"
+                  id="err-riwaya"
+                ></div>
+
+              </div>
+
+              <div class="mb-3">
+
+                <label
+                  for="r-sura-ar"
+                  class="report-label"
+                >
+                  <i class="bi bi-book-fill me-1"></i>
+                  السورة *
+                </label>
+
+                <select
+                  id="r-sura-ar"
+                  class="report-input"
+                  required
+                  style="cursor: pointer"
+                >
+
+                  <option
+                    value=""
+                    disabled
+                    selected
+                  >
+                    اختر السورة...
+                  </option>
+
+                </select>
+
+                <div
+                  class="report-field-error"
+                  id="err-sura-ar"
+                ></div>
+
+              </div>
+
+              <div class="row g-3 mb-3">
+
+                <div class="col-6">
+
+                  <label
+                    for="r-page"
+                    class="report-label"
+                  >
+                    <i class="bi bi-file-text-fill me-1"></i>
+                    الصفحة *
+                  </label>
+
+                  <select
+                    id="r-page"
+                    class="report-input"
+                    required
+                    style="cursor: pointer"
+                  >
+
+                    <option
+                      value=""
+                      disabled
+                      selected
+                    >
+                      —
+                    </option>
+
+                  </select>
+
+                  <div
+                    class="report-field-error"
+                    id="err-page"
+                  ></div>
+
+                </div>
+
+                <div class="col-6">
+
+                  <label
+                    for="r-aya"
+                    class="report-label"
+                  >
+                    <i class="bi bi-hash me-1"></i>
+                    الآية *
+                  </label>
+
+                  <select
+                    id="r-aya"
+                    class="report-input"
+                    required
+                    style="cursor: pointer"
+                  >
+
+                    <option
+                      value=""
+                      disabled
+                      selected
+                    >
+                      —
+                    </option>
+
+                  </select>
+
+                  <div
+                    class="report-field-error"
+                    id="err-aya"
+                  ></div>
+
+                </div>
+
+              </div>
+
+              <div class="mb-3">
+
+                <label
+                  for="r-details"
+                  class="report-label"
+                >
+                  <i class="bi bi-chat-text-fill me-1"></i>
+                  تفاصيل الرسالة *
+                </label>
+
+                <textarea
+                  id="r-details"
+                  class="report-input"
+                  rows="4"
+                  placeholder="صِف الخطأ أو الاقتراح بالتفصيل..."
+                  required
+                ></textarea>
+
+                <div
+                  class="report-field-error"
+                  id="err-details"
+                ></div>
+
+              </div>
+
+              <div class="mb-4">
+
+                <label
+                  for="r-upload"
+                  class="report-label"
+                >
+                  <i class="bi bi-paperclip me-1"></i>
+                  مرفقات (اختياري)
+                </label>
+
+                <input
+                  type="file"
+                  id="r-upload"
+                  class="report-input"
+                  accept="image/*,application/pdf"
+                  multiple
+                />
+
+                <small class="report-hint">
+                  يمكنك إرفاق صور أو ملفات PDF. اضغط Ctrl/Cmd لاختيار أكثر من ملف.
+                </small>
+
+              </div>
+
+              <div
+                id="r-status"
+                class="report-status mb-3"
+                style="display: none"
+              ></div>
+
+              <button
+                type="submit"
+                id="r-submit-btn"
+                class="report-submit-btn"
+              >
+                <i class="bi bi-send-fill"></i>
+                إرسال التقرير
+              </button>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Speed-dial FAB ── -->
+    <div
+      class="fab-speed-dial"
+      id="fab-speed-dial"
+    >
+
+      <div
+        class="fab-actions"
+        id="fab-actions"
+      >
+
+        <!-- About -->
+        <button
+          class="fab-action-btn"
+          id="fab-about-btn"
+          title="عن التطبيق"
+        >
+          <i class="bi bi-question-lg"></i>
+        </button>
+
+        <!-- Theme toggle -->
+        <button
+          class="fab-action-btn"
+          onclick="
+            toggleTheme();
+            closeFab();
+          "
+          id="fab-theme-btn"
+          title="تبديل المظهر"
+        >
+          <i
+            class="bi bi-moon-stars-fill"
+            id="fab-theme-icon"
+          ></i>
+        </button>
+
+        <!-- Fullscreen enter -->
+        <button
+          class="fab-action-btn fab-fs-enter"
+          onclick="
+            toggleFullscreen();
+            closeFab();
+          "
+          title="ملء الشاشة"
+        >
+          <i class="bi bi-fullscreen"></i>
+        </button>
+
+        <!-- Fullscreen exit -->
+        <button
+          class="fab-action-btn fab-fs-exit"
+          onclick="
+            toggleFullscreen();
+            closeFab();
+          "
+          title="إنهاء ملء الشاشة"
+        >
+          <i class="bi bi-fullscreen-exit"></i>
+        </button>
+
+        <!-- Sidebar / Menu -->
+        <button
+          class="fab-action-btn"
+          id="fab-sidebar-btn"
+          title="القائمة"
+          aria-label="القائمة"
+        >
+          <i class="bi bi-list"></i>
+        </button>
+
+      </div>
+
+      <!-- Trigger -->
+      <button
+        class="fab-trigger"
+        id="fab-trigger"
+        onclick="toggleFab()"
+        title="القائمة السريعة"
+        aria-label="القائمة السريعة"
+        aria-expanded="false"
+      >
+        <i class="bi bi-plus-lg fab-trigger-icon"></i>
+      </button>
+
+    </div>
+
+    <!-- Backdrop closes FAB on outside tap -->
+    <div
+      class="fab-backdrop"
+      id="fab-backdrop"
+      onclick="closeFab()"
+    ></div>
+
+    <!-- Custom Scripts -->
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/report.js"></script>
+   </body>
+ </html>
