@@ -16,9 +16,18 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Create package.json
         run: |
-          npm install
+          npm init -y
+
+      - name: Install Capacitor
+        run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
       - name: Create Capacitor config
@@ -32,16 +41,32 @@ jobs:
           EOF
 
       - name: Create Android project
-        run: npx cap add android
+        run: |
+          npx cap add android
 
       - name: Copy website
-        run: npx cap copy android
-
-      - name: Set app name
         run: |
-          sed -i 's/app_name">.*</app_name>/app_name">سَكينة - تحفيظ القرآن الكريم</app_name>/' android/app/src/main/res/values/strings.xml
+          npx cap copy android
 
-      - name: Set app icon
+      - name: Set application name
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("android/app/src/main/res/values/strings.xml")
+          s = p.read_text()
+
+          import re
+          s = re.sub(
+              r'<string name="app_name">.*?</string>',
+              '<string name="app_name">سَكينة - تحفيظ القرآن الكريم</string>',
+              s
+          )
+
+          p.write_text(s)
+          PY
+
+      - name: Set application icon
         run: |
           mkdir -p android/app/src/main/res/drawable
           cp assets/imgs/app_icon.png android/app/src/main/res/drawable/app_icon.png
@@ -51,10 +76,17 @@ jobs:
 
           p = Path("android/app/src/main/AndroidManifest.xml")
           s = p.read_text()
-          s = s.replace('android:icon="@mipmap/ic_launcher"',
-                        'android:icon="@drawable/app_icon"')
-          s = s.replace('android:roundIcon="@mipmap/ic_launcher_round"',
-                        'android:roundIcon="@drawable/app_icon"')
+
+          s = s.replace(
+              '@mipmap/ic_launcher',
+              '@drawable/app_icon'
+          )
+
+          s = s.replace(
+              '@mipmap/ic_launcher_round',
+              '@drawable/app_icon'
+          )
+
           p.write_text(s)
           PY
 
@@ -64,8 +96,13 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
+      - name: Rename APK
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk \
+             sakina-quran.apk
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: sakina-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: Sakina-Quran-APK
+          path: sakina-quran.apk
