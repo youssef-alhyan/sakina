@@ -16,41 +16,47 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Create package.json
+      - name: Install dependencies
         run: |
-          npm init -y
+          npm install
           npm install @capacitor/core @capacitor/cli @capacitor/android
-
-      - name: Prepare website
-        run: |
-          mkdir -p www
-          cp index.html www/
-          cp -r assets www/
-          cp -r scripts www/
 
       - name: Create Capacitor config
         run: |
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.sakina.quran",
-            "appName": "Sakina",
-            "webDir": "www"
+            "appName": "سَكينة - تحفيظ القرآن الكريم",
+            "webDir": "."
           }
           EOF
 
       - name: Create Android project
-        run: |
-          npx cap add android
+        run: npx cap add android
 
       - name: Copy website
+        run: npx cap copy android
+
+      - name: Set app name
         run: |
-          npx cap copy android
+          sed -i 's/app_name">.*</app_name>/app_name">سَكينة - تحفيظ القرآن الكريم</app_name>/' android/app/src/main/res/values/strings.xml
+
+      - name: Set app icon
+        run: |
+          mkdir -p android/app/src/main/res/drawable
+          cp assets/imgs/app_icon.png android/app/src/main/res/drawable/app_icon.png
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          s = s.replace('android:icon="@mipmap/ic_launcher"',
+                        'android:icon="@drawable/app_icon"')
+          s = s.replace('android:roundIcon="@mipmap/ic_launcher_round"',
+                        'android:roundIcon="@drawable/app_icon"')
+          p.write_text(s)
+          PY
 
       - name: Build APK
         working-directory: android
