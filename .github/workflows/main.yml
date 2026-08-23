@@ -16,10 +16,23 @@ jobs:
         with:
           node-version: 22
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
       - name: Create package.json
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Prepare website
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cp -r assets www/
+          cp -r scripts www/
 
       - name: Create Capacitor config
         run: |
@@ -27,10 +40,7 @@ jobs:
           {
             "appId": "com.sakina.quran",
             "appName": "Sakina",
-            "webDir": ".",
-            "server": {
-              "androidScheme": "https"
-            }
+            "webDir": "www"
           }
           EOF
 
