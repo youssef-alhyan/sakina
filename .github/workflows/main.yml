@@ -16,17 +16,41 @@ jobs:
         with:
           node-version: 22
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
       - name: Create package.json
         run: |
           npm init -y
+
+      - name: Install Capacitor
+        run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          npm install -D typescript
+
+      - name: Prepare website
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cp -r assets www/
+          cp -r scripts www/
 
       - name: Create Capacitor config
         run: |
-          npx cap init "Sakina" "com.sakina.quran" --web-dir .
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.youssef.sakina",
+            "appName": "Sakina",
+            "webDir": "www",
+            "server": {
+              "androidScheme": "https"
+            }
+          }
+          EOF
 
-      - name: Install Android platform
+      - name: Create Android project
         run: |
           npx cap add android
 
@@ -34,18 +58,13 @@ jobs:
         run: |
           npx cap copy android
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Sync Capacitor
+        run: |
+          npx cap sync android
 
       - name: Build APK
-        working-directory: android
         run: |
+          cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
