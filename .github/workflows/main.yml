@@ -44,10 +44,8 @@ jobs:
           }
           EOF
 
-          cat capacitor.config.json
-
       - name: Add Android
-        run: npx cap add android --no-sync
+        run: npx cap add android
 
       - name: Sync Android
         run: npx cap sync android
