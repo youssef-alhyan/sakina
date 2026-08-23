@@ -23,22 +23,20 @@ jobs:
             "name": "sakina",
             "version": "1.0.0",
             "private": true,
-            "scripts": {
-              "build": "echo No build step"
-            },
             "dependencies": {
               "@capacitor/core": "^8.0.0"
             },
             "devDependencies": {
-              "@capacitor/cli": "^8.0.0"
+              "@capacitor/cli": "^8.0.0",
+              "typescript": "^5.0.0"
             }
           }
           EOF
 
-      - name: Install Capacitor
+      - name: Install dependencies
         run: npm install
 
-      - name: Install Android platform
+      - name: Install Android
         run: npm install @capacitor/android@^8.0.0
 
       - name: Create Capacitor config
@@ -59,7 +57,7 @@ jobs:
       - name: Add Android
         run: npx cap add android
 
-      - name: Copy website into Android app
+      - name: Copy website
         run: npx cap copy android
 
       - name: Build APK
