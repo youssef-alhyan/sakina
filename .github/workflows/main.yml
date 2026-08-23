@@ -1,0 +1,55 @@
+name: Build Sakina Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get project
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Create package.json
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Create Capacitor config
+        run: |
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.sakina.quran",
+            "appName": "Sakina",
+            "webDir": ".",
+            "server": {
+              "androidScheme": "https"
+            }
+          }
+          EOF
+
+      - name: Create Android project
+        run: |
+          npx cap add android
+
+      - name: Copy website
+        run: |
+          npx cap copy android
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: sakina-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
