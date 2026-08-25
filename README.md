@@ -11,7 +11,7 @@
 
 A lightweight, offline/online-friendly Mushaf web app (Arabic / RTL) supporting both **Warsh** and **Hafs** riwayas. Browse the Qur'an by Surah, Juz', or Page and listen verse-by-verse audio with full playback controls.
 
-> 🌐 **Live site:** [sarayan.pages.dev](https://sarayan.pages.dev/)
+> 🌐 **Live site:** [sakina.pages.dev](https://youssef-alhyan.github.io/sakina/)
 > 📦 **Android APK:** [Download from Releases](https://github.com/zedsalim/sarayan/releases)
 
 ## Screenshots
