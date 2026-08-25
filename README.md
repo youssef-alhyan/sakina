@@ -40,18 +40,9 @@ A lightweight, offline/online-friendly Mushaf web app (Arabic / RTL) supporting 
 
 You can use the app in three ways:
 
-- **Online (no setup):** visit [sarayan.pages.dev](https://sarayan.pages.dev/) directly in your browser.
-- **Android:** download and install the APK from [Releases](https://github.com/zedsalim/sarayan/releases) _(enable "Install from unknown sources" if prompted)_.
+- **Online (no setup):** visit [sarayan.pages.dev](https://youssef-alhyan.github.io/sakina/) directly in your browser.
+- **Android:** download and install the APK from [Releases](https://github.com/youssef-alhyan/sakina/releases/download/v1.0.0/app-debug.apk) _(enable "Install from unknown sources" if prompted)_.
 - **Locally:** clone the repo and serve it yourself (required for offline audio).
-
-### 1. Get the code
-
-```bash
-git clone https://github.com/zedsalim/sarayan
-cd sarayan
-```
-
-### 2. Serve it locally
 
 The app must be served over HTTP — opening `index.html` directly won't work. Pick any of these:
 
