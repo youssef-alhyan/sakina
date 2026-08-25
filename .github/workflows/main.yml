@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Get project
         uses: actions/checkout@v4
 
@@ -19,16 +20,23 @@ jobs:
       - name: Create package.json
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/android
-          npm install -D @capacitor/cli
+          npm install @capacitor/core@7.4.3 @capacitor/android@7.4.3
+          npm install -D @capacitor/cli@7.4.3 @capacitor/assets@3.0.5
 
       - name: Create web folder
         run: |
           rm -rf www
           mkdir -p www
+
           cp index.html www/
-          cp -r assets www/
-          cp -r scripts www/ || true
+
+          if [ -d assets ]; then
+            cp -r assets www/
+          fi
+
+          if [ -d scripts ]; then
+            cp -r scripts www/
+          fi
 
       - name: Create Capacitor config
         run: |
@@ -45,34 +53,43 @@ jobs:
           EOF
 
       - name: Add Android
-        run: npx cap add android
+        run: |
+          npx cap add android
 
       - name: Sync Android
-        run: npx cap sync android
-
-      - name: Fix Kotlin dependencies
         run: |
-          cat >> android/build.gradle <<'EOF'
+          npx cap sync android
 
-          allprojects {
-              configurations.all {
-                  resolutionStrategy.eachDependency { details ->
-                      if (details.requested.group == "org.jetbrains.kotlin") {
-                          details.useVersion "1.8.22"
-                      }
-                  }
-              }
-          }
-          EOF
+      # ==========================================
+      # NEW APP ICON
+      # ==========================================
+
+      - name: Prepare new app icon
+        run: |
+          rm -rf resources
+          mkdir -p resources
+
+          cp assets/imgs/app_icon.png resources/icon.png
+
+      - name: Generate Android app icons
+        run: |
+          npx @capacitor/assets generate \
+            --android \
+            --iconBackgroundColor '#ffffff' \
+            --iconBackgroundColorDark '#ffffff'
+
+      # ==========================================
+      # APP NAME
+      # ==========================================
 
       - name: Set app name
         run: |
-          sed -i 's/app_name">.*</app_name>/app_name">سَكينة - تحفيظ القرآن الكريم</app_name>/' android/app/src/main/res/values/strings.xml || true
+          sed -i 's#<string name="app_name">.*</string>#<string name="app_name">سَكينة - تحفيظ القرآن الكريم</string>#' \
+          android/app/src/main/res/values/strings.xml
 
-      - name: Set app icon
-        run: |
-          mkdir -p android/app/src/main/res/drawable
-          cp assets/imgs/app_icon.png android/app/src/main/res/drawable/app_icon.png
+      # ==========================================
+      # BUILD
+      # ==========================================
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -80,12 +97,20 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build APK
+      - name: Clean Android
         run: |
           cd android
           chmod +x gradlew
           ./gradlew clean
+
+      - name: Build APK
+        run: |
+          cd android
           ./gradlew assembleDebug
+
+      # ==========================================
+      # UPLOAD APK
+      # ==========================================
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
