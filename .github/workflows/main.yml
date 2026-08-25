@@ -9,19 +9,41 @@ jobs:
 
     steps:
 
+      # ==========================================
+      # GET PROJECT
+      # ==========================================
+
       - name: Get project
         uses: actions/checkout@v4
+
+
+      # ==========================================
+      # NODE.JS
+      # ==========================================
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+
+      # ==========================================
+      # INSTALL CAPACITOR
+      # ==========================================
+
       - name: Create package
         run: |
           npm init -y
-          npm install @capacitor/core@7.4.3 @capacitor/android@7.4.3
+
+          npm install @capacitor/core@7.4.3
+          npm install @capacitor/android@7.4.3
+
           npm install -D @capacitor/cli@7.4.3
+
+
+      # ==========================================
+      # CREATE WEB FOLDER
+      # ==========================================
 
       - name: Create web folder
         run: |
@@ -38,8 +60,17 @@ jobs:
             cp -r scripts www/
           fi
 
+
+      # ==========================================
+      # CAPACITOR CONFIG
+      # ==========================================
+
       - name: Create Capacitor config
         run: |
+          rm -f capacitor.config.json
+          rm -f capacitor.config.js
+          rm -f capacitor.config.ts
+
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.sakina.quran",
@@ -48,117 +79,202 @@ jobs:
           }
           EOF
 
+
+      # ==========================================
+      # CREATE ANDROID PROJECT
+      # ==========================================
+
       - name: Add Android
         run: |
           npx cap add android
+
+
+      # ==========================================
+      # SYNC
+      # ==========================================
 
       - name: Sync Android
         run: |
           npx cap sync android
 
-      # ===============================
-      # CREATE NEW ICON
-      # ===============================
 
-      - name: Install ImageMagick
+      # ==========================================
+      # INSTALL PYTHON IMAGE LIBRARY
+      # ==========================================
+
+      - name: Install Pillow
         run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick
+          python3 -m pip install --upgrade pip
+          python3 -m pip install Pillow
 
-      - name: Replace Android launcher icon
-        run: |
-          ICON="assets/imgs/app_icon.png"
 
-          test -f "$ICON"
+      # ==========================================
+      # CREATE NEW ANDROID ICON
+      # ==========================================
 
-          RES="android/app/src/main/res"
-
-          rm -rf "$RES"/mipmap-*
-          rm -rf "$RES"/drawable/ic_launcher*
-          rm -rf "$RES"/drawable-v24/ic_launcher*
-
-          mkdir -p "$RES/mipmap-mdpi"
-          mkdir -p "$RES/mipmap-hdpi"
-          mkdir -p "$RES/mipmap-xhdpi"
-          mkdir -p "$RES/mipmap-xxhdpi"
-          mkdir -p "$RES/mipmap-xxxhdpi"
-
-          magick "$ICON" -resize 48x48 \
-            "$RES/mipmap-mdpi/ic_launcher.png"
-
-          magick "$ICON" -resize 72x72 \
-            "$RES/mipmap-hdpi/ic_launcher.png"
-
-          magick "$ICON" -resize 96x96 \
-            "$RES/mipmap-xhdpi/ic_launcher.png"
-
-          magick "$ICON" -resize 144x144 \
-            "$RES/mipmap-xxhdpi/ic_launcher.png"
-
-          magick "$ICON" -resize 192x192 \
-            "$RES/mipmap-xxxhdpi/ic_launcher.png"
-
-          cp "$RES/mipmap-mdpi/ic_launcher.png" \
-             "$RES/mipmap-mdpi/ic_launcher_round.png"
-
-          cp "$RES/mipmap-hdpi/ic_launcher.png" \
-             "$RES/mipmap-hdpi/ic_launcher_round.png"
-
-          cp "$RES/mipmap-xhdpi/ic_launcher.png" \
-             "$RES/mipmap-xhdpi/ic_launcher_round.png"
-
-          cp "$RES/mipmap-xxhdpi/ic_launcher.png" \
-             "$RES/mipmap-xxhdpi/ic_launcher_round.png"
-
-          cp "$RES/mipmap-xxxhdpi/ic_launcher.png" \
-             "$RES/mipmap-xxxhdpi/ic_launcher_round.png"
-
-      # ===============================
-      # FORCE ANDROID TO USE THE ICON
-      # ===============================
-
-      - name: Force launcher icon in Manifest
+      - name: Create NEW Sakina icon
         run: |
           python3 <<'PY'
+
+          from PIL import Image
           from pathlib import Path
 
-          p = Path("android/app/src/main/AndroidManifest.xml")
-          text = p.read_text()
+          source = Path("assets/imgs/app_icon.png")
+          res = Path("android/app/src/main/res")
 
-          text = text.replace(
-              'android:icon="@mipmap/ic_launcher"',
-              'android:icon="@mipmap/ic_launcher"'
+          print("Checking icon...")
+
+          if not source.exists():
+              raise SystemExit(
+                  "ERROR: assets/imgs/app_icon.png was not found"
+              )
+
+          print("Found:", source)
+
+          # Remove ALL old launcher icons
+          for path in res.glob("mipmap-*"):
+              if path.is_dir():
+                  for item in path.glob("ic_launcher*"):
+                      if item.is_file():
+                          item.unlink()
+
+          # Remove old adaptive icon folders
+          for folder in [
+              res / "mipmap-anydpi",
+              res / "mipmap-anydpi-v26"
+          ]:
+              if folder.exists():
+                  import shutil
+                  shutil.rmtree(folder)
+
+          # Open NEW image
+          image = Image.open(source).convert("RGBA")
+
+          print("Image size:", image.size)
+
+          sizes = {
+              "mipmap-mdpi": 48,
+              "mipmap-hdpi": 72,
+              "mipmap-xhdpi": 96,
+              "mipmap-xxhdpi": 144,
+              "mipmap-xxxhdpi": 192
+          }
+
+          for folder_name, size in sizes.items():
+
+              folder = res / folder_name
+              folder.mkdir(parents=True, exist_ok=True)
+
+              # Resize image
+              icon = image.copy()
+              icon.thumbnail(
+                  (size, size),
+                  Image.Resampling.LANCZOS
+              )
+
+              # Transparent canvas
+              canvas = Image.new(
+                  "RGBA",
+                  (size, size),
+                  (0, 0, 0, 0)
+              )
+
+              x = (size - icon.width) // 2
+              y = (size - icon.height) // 2
+
+              canvas.alpha_composite(icon, (x, y))
+
+              # Normal icon
+              canvas.save(
+                  folder / "ic_launcher.png"
+              )
+
+              # Round icon
+              canvas.save(
+                  folder / "ic_launcher_round.png"
+              )
+
+              print(
+                  "Created:",
+                  folder_name,
+                  size,
+                  "x",
+                  size
+              )
+
+          print("")
+          print("================================")
+          print("NEW SAKINA ICON CREATED")
+          print("================================")
+
+          PY
+
+
+      # ==========================================
+      # FORCE ANDROID MANIFEST TO USE NEW ICON
+      # ==========================================
+
+      - name: Set launcher icon
+        run: |
+          python3 <<'PY'
+
+          from pathlib import Path
+          import re
+
+          manifest = Path(
+              "android/app/src/main/AndroidManifest.xml"
           )
 
-          if 'android:roundIcon=' in text:
-              import re
-              text = re.sub(
-                  r'\s+android:roundIcon="[^"]*"',
-                  ' android:roundIcon="@mipmap/ic_launcher_round"',
-                  text
-              )
-          else:
+          text = manifest.read_text()
+
+          # Replace existing icon
+          text = re.sub(
+              r'android:icon="[^"]*"',
+              'android:icon="@mipmap/ic_launcher"',
+              text
+          )
+
+          # Replace round icon if it exists
+          text = re.sub(
+              r'android:roundIcon="[^"]*"',
+              'android:roundIcon="@mipmap/ic_launcher_round"',
+              text
+          )
+
+          # If roundIcon doesn't exist, add it
+          if 'android:roundIcon=' not in text:
+
               text = text.replace(
                   '<application ',
                   '<application android:roundIcon="@mipmap/ic_launcher_round" ',
                   1
               )
 
-          p.write_text(text)
+          manifest.write_text(text)
+
+          print("AndroidManifest updated")
+          print("Icon: @mipmap/ic_launcher")
+          print("Round icon: @mipmap/ic_launcher_round")
+
           PY
 
-      # ===============================
+
+      # ==========================================
       # APP NAME
-      # ===============================
+      # ==========================================
 
       - name: Set app name
         run: |
           python3 <<'PY'
+
           from pathlib import Path
           import re
 
-          p = Path("android/app/src/main/res/values/strings.xml")
-          text = p.read_text()
+          strings = Path(
+              "android/app/src/main/res/values/strings.xml"
+          )
+
+          text = strings.read_text()
 
           text = re.sub(
               r'<string name="app_name">.*?</string>',
@@ -167,12 +283,16 @@ jobs:
               flags=re.DOTALL
           )
 
-          p.write_text(text)
+          strings.write_text(text)
+
+          print("App name updated")
+
           PY
 
-      # ===============================
-      # KOTLIN FIX
-      # ===============================
+
+      # ==========================================
+      # FIX KOTLIN
+      # ==========================================
 
       - name: Fix Kotlin dependencies
         run: |
@@ -187,11 +307,13 @@ jobs:
                   }
               }
           }
+
           EOF
 
-      # ===============================
+
+      # ==========================================
       # JAVA
-      # ===============================
+      # ==========================================
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -199,20 +321,25 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # ===============================
-      # BUILD
-      # ===============================
+
+      # ==========================================
+      # BUILD APK
+      # ==========================================
 
       - name: Build APK
         run: |
           cd android
+
           chmod +x gradlew
+
           ./gradlew clean
+
           ./gradlew assembleDebug
 
-      # ===============================
-      # UPLOAD
-      # ===============================
+
+      # ==========================================
+      # UPLOAD APK
+      # ==========================================
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
