@@ -17,11 +17,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Create package.json
+      - name: Create package
         run: |
           npm init -y
           npm install @capacitor/core@7.4.3 @capacitor/android@7.4.3
-          npm install -D @capacitor/cli@7.4.3 @capacitor/assets@3.0.5
+          npm install -D @capacitor/cli@7.4.3
 
       - name: Create web folder
         run: |
@@ -40,10 +40,6 @@ jobs:
 
       - name: Create Capacitor config
         run: |
-          rm -f capacitor.config.json
-          rm -f capacitor.config.ts
-          rm -f capacitor.config.js
-
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.sakina.quran",
@@ -60,36 +56,142 @@ jobs:
         run: |
           npx cap sync android
 
-      # ==========================================
-      # NEW APP ICON
-      # ==========================================
+      # ===============================
+      # CREATE NEW ICON
+      # ===============================
 
-      - name: Prepare new app icon
+      - name: Install ImageMagick
         run: |
-          rm -rf resources
-          mkdir -p resources
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
-          cp assets/imgs/app_icon.png resources/icon.png
-
-      - name: Generate Android app icons
+      - name: Replace Android launcher icon
         run: |
-          npx @capacitor/assets generate \
-            --android \
-            --iconBackgroundColor '#ffffff' \
-            --iconBackgroundColorDark '#ffffff'
+          ICON="assets/imgs/app_icon.png"
 
-      # ==========================================
+          test -f "$ICON"
+
+          RES="android/app/src/main/res"
+
+          rm -rf "$RES"/mipmap-*
+          rm -rf "$RES"/drawable/ic_launcher*
+          rm -rf "$RES"/drawable-v24/ic_launcher*
+
+          mkdir -p "$RES/mipmap-mdpi"
+          mkdir -p "$RES/mipmap-hdpi"
+          mkdir -p "$RES/mipmap-xhdpi"
+          mkdir -p "$RES/mipmap-xxhdpi"
+          mkdir -p "$RES/mipmap-xxxhdpi"
+
+          magick "$ICON" -resize 48x48 \
+            "$RES/mipmap-mdpi/ic_launcher.png"
+
+          magick "$ICON" -resize 72x72 \
+            "$RES/mipmap-hdpi/ic_launcher.png"
+
+          magick "$ICON" -resize 96x96 \
+            "$RES/mipmap-xhdpi/ic_launcher.png"
+
+          magick "$ICON" -resize 144x144 \
+            "$RES/mipmap-xxhdpi/ic_launcher.png"
+
+          magick "$ICON" -resize 192x192 \
+            "$RES/mipmap-xxxhdpi/ic_launcher.png"
+
+          cp "$RES/mipmap-mdpi/ic_launcher.png" \
+             "$RES/mipmap-mdpi/ic_launcher_round.png"
+
+          cp "$RES/mipmap-hdpi/ic_launcher.png" \
+             "$RES/mipmap-hdpi/ic_launcher_round.png"
+
+          cp "$RES/mipmap-xhdpi/ic_launcher.png" \
+             "$RES/mipmap-xhdpi/ic_launcher_round.png"
+
+          cp "$RES/mipmap-xxhdpi/ic_launcher.png" \
+             "$RES/mipmap-xxhdpi/ic_launcher_round.png"
+
+          cp "$RES/mipmap-xxxhdpi/ic_launcher.png" \
+             "$RES/mipmap-xxxhdpi/ic_launcher_round.png"
+
+      # ===============================
+      # FORCE ANDROID TO USE THE ICON
+      # ===============================
+
+      - name: Force launcher icon in Manifest
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          text = p.read_text()
+
+          text = text.replace(
+              'android:icon="@mipmap/ic_launcher"',
+              'android:icon="@mipmap/ic_launcher"'
+          )
+
+          if 'android:roundIcon=' in text:
+              import re
+              text = re.sub(
+                  r'\s+android:roundIcon="[^"]*"',
+                  ' android:roundIcon="@mipmap/ic_launcher_round"',
+                  text
+              )
+          else:
+              text = text.replace(
+                  '<application ',
+                  '<application android:roundIcon="@mipmap/ic_launcher_round" ',
+                  1
+              )
+
+          p.write_text(text)
+          PY
+
+      # ===============================
       # APP NAME
-      # ==========================================
+      # ===============================
 
       - name: Set app name
         run: |
-          sed -i 's#<string name="app_name">.*</string>#<string name="app_name">سَكينة - تحفيظ القرآن الكريم</string>#' \
-          android/app/src/main/res/values/strings.xml
+          python3 <<'PY'
+          from pathlib import Path
+          import re
 
-      # ==========================================
-      # BUILD
-      # ==========================================
+          p = Path("android/app/src/main/res/values/strings.xml")
+          text = p.read_text()
+
+          text = re.sub(
+              r'<string name="app_name">.*?</string>',
+              '<string name="app_name">سَكينة - تحفيظ القرآن الكريم</string>',
+              text,
+              flags=re.DOTALL
+          )
+
+          p.write_text(text)
+          PY
+
+      # ===============================
+      # KOTLIN FIX
+      # ===============================
+
+      - name: Fix Kotlin dependencies
+        run: |
+          cat >> android/build.gradle <<'EOF'
+
+          allprojects {
+              configurations.all {
+                  resolutionStrategy.eachDependency { details ->
+                      if (details.requested.group == "org.jetbrains.kotlin") {
+                          details.useVersion "1.8.22"
+                      }
+                  }
+              }
+          }
+          EOF
+
+      # ===============================
+      # JAVA
+      # ===============================
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -97,20 +199,20 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Clean Android
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew clean
+      # ===============================
+      # BUILD
+      # ===============================
 
       - name: Build APK
         run: |
           cd android
+          chmod +x gradlew
+          ./gradlew clean
           ./gradlew assembleDebug
 
-      # ==========================================
-      # UPLOAD APK
-      # ==========================================
+      # ===============================
+      # UPLOAD
+      # ===============================
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
