@@ -6,10 +6,8 @@
 <hr/>
 
 تطبيق مصحف إلكتروني خفيف الوزن يدعم العمل أونلاين وأوفلاين (عربي / RTL)، يدعم روايتَي **ورش** و**حفص**. تصفّح القرآن الكريم بالسور أو الأجزاء أو الصفحات، واستمع إلى التلاوة آية بآية مع تحكم كامل في التشغيل.
-
-> 🌐 **الموقع المباشر:** [sarayan.pages.dev](https://sarayan.pages.dev/)
-> 📦 **تطبيق أندرويد (APK):** [تنزيل من Releases](https://github.com/zedsalim/sarayan/releases)
-
+> 🌐 **الموقع المباشر:** [youssef-alhyan.github.io/sakina](https://youssef-alhyan.github.io/sakina/)
+> 📦 **تطبيق أندرويد (APK):** [تنزيل التطبيق](https://github.com/youssef-alhyan/sakina/releases/download/v1.0.0/app-debug.apk)
 ---
 
 🌐 [English](./README.md) | **العربية**
@@ -41,35 +39,10 @@
 ## تشغيل التطبيق
 
 يمكنك استخدام التطبيق بثلاث طرق:
-
-- **أونلاين:** قم بزيارة [sarayan.pages.dev](https://sarayan.pages.dev/) مباشرة من المتصفح.
-- **أندرويد:** نزّل وثبّت ملف APK من [Releases](https://github.com/zedsalim/sarayan/releases) _(قم بتفعيل "التثبيت من مصادر غير معروفة" إذا طُلب منك ذلك)_.
+> 🌐 **الموقع المباشر:** [youssef-alhyan.github.io/sakina](https://youssef-alhyan.github.io/sakina/)
+> 📦 **تطبيق أندرويد (APK):** [تنزيل التطبيق](https://github.com/youssef-alhyan/sakina/releases/download/v1.0.0/app-debug.apk)_.
 - **محلياً:** استنسخ المستودع وشغّله بنفسك (مطلوب للصوت في وضع أوفلاين).
 
-### 1. الحصول على الكود
-
-```bash
-git clone https://github.com/zedsalim/sarayan
-cd sarayan
-```
-
-### 2. تشغيل الخادم المحلي
-
-يجب تشغيل التطبيق عبر HTTP — فتح `index.html` مباشرةً لن يعمل. اختر أياً من الطرق التالية:
-
-```bash
-# Python 3
-python -m http.server 3000
-
-# Python 2
-python -m SimpleHTTPServer 3000
-
-# Node.js (npx)
-npx serve .
-
-# VS Code
-# ثبّت امتداد "Live Server" وانقر على "Go Live"
-```
 
 ثم افتح [http://localhost:3000](http://localhost:3000) في متصفحك.
 
