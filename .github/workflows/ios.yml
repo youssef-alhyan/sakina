@@ -1,0 +1,142 @@
+
+name: Build Sakina iOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout Sakina
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core@7.4.3
+          npm install @capacitor/ios@7.4.3
+          npm install -D @capacitor/cli@7.4.3
+
+      - name: Prepare Web Files
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cp -R assets www/
+          if [ -d scripts ]; then
+            cp -R scripts www/
+          fi
+
+      - name: Configure Capacitor
+        run: |
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.sakina.quran",
+            "appName": "Sakina",
+            "webDir": "www"
+          }
+          EOF
+
+      - name: Create iOS Project
+        run: npx cap add ios
+
+      - name: Sync iOS
+        run: npx cap sync ios
+
+      - name: Generate Sakina App Icon
+        run: |
+          python3 -m pip install Pillow
+
+          python3 <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          import json
+
+          source = Path("assets/imgs/app_icon.png")
+          output = Path(
+              "ios/App/App/Assets.xcassets/"
+              "AppIcon.appiconset"
+          )
+
+          if not source.exists():
+              raise SystemExit("Sakina icon not found")
+
+          output.mkdir(parents=True, exist_ok=True)
+
+          im = Image.open(source).convert("RGBA")
+          bg = Image.new("RGBA", im.size, "#F8F4E8")
+          bg.alpha_composite(im)
+          im = bg.convert("RGB")
+
+          entries = []
+
+          sizes = [
+              ("iphone", "20", "2x", 40),
+              ("iphone", "20", "3x", 60),
+              ("iphone", "29", "2x", 58),
+              ("iphone", "29", "3x", 87),
+              ("iphone", "40", "2x", 80),
+              ("iphone", "40", "3x", 120),
+              ("iphone", "60", "2x", 120),
+              ("iphone", "60", "3x", 180),
+              ("ipad", "20", "1x", 20),
+              ("ipad", "20", "2x", 40),
+              ("ipad", "29", "1x", 29),
+              ("ipad", "29", "2x", 58),
+              ("ipad", "40", "1x", 40),
+              ("ipad", "40", "2x", 80),
+              ("ipad", "76", "1x", 76),
+              ("ipad", "76", "2x", 152),
+              ("ipad", "83.5", "2x", 167),
+              ("ios-marketing", "1024", "1x", 1024)
+          ]
+
+          for idiom, size, scale, pixels in sizes:
+              filename = f"icon-{idiom}-{size}-{scale}.png"
+              im.resize(
+                  (pixels, pixels),
+                  Image.Resampling.LANCZOS
+              ).save(output / filename)
+
+              entries.append({
+                  "filename": filename,
+                  "idiom": idiom,
+                  "scale": scale,
+                  "size": f"{size}x{size}"
+              })
+
+          (output / "Contents.json").write_text(
+              json.dumps({"images": entries, "info": {
+                  "author": "xcode", "version": 1
+              }}, indent=2)
+          )
+
+          print("Sakina app icons created successfully")
+          PY
+
+      - name: Build iOS Simulator App
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package Simulator App
+        run: |
+          cd build/Build/Products/Debug-iphonesimulator
+          zip -r "$GITHUB_WORKSPACE/Sakina-iOS-Simulator.zip" App.app
+
+      - name: Upload iOS Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sakina-iOS-Simulator
+          path: Sakina-iOS-Simulator.zip
