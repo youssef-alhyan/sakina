@@ -1,36 +1,31 @@
 
-name: Build Sakina iOS
+name: Build Sakina for iOS Simulator
 
 'on':
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   build-ios:
-    name: Build Sakina for iOS Simulator
     runs-on: macos-15
-    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Create package.json
-        run: npm init -y
+      - name: Setup CocoaPods
+        run: |
+          sudo gem install cocoapods
 
       - name: Install Capacitor
         run: |
-          npm install --save-exact \
-            @capacitor/core@7.4.3 \
-            @capacitor/ios@7.4.3 \
-            @capacitor/cli@7.4.3
+          npm init -y
+          npm install --save-exact @capacitor/core @capacitor/ios
+          npm install --save-exact @capacitor/cli
 
       - name: Prepare web files
         run: |
@@ -38,50 +33,91 @@ jobs:
           cp index.html www/
 
           if [ -d assets ]; then
-            cp -R assets www/assets
+            cp -R assets www/
           fi
 
           if [ -d scripts ]; then
-            cp -R scripts www/scripts
+            cp -R scripts www/
           fi
 
-      - name: Create Capacitor configuration
+      - name: Configure Sakina
         run: |
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.sakina.quran",
-            "appName": "Sakina",
+            "appName": "سَكينة - تحفيظ القرآن الكريم",
             "webDir": "www"
           }
           EOF
 
-      - name: Add iOS platform
-        run: npx cap add ios
+      - name: Create iOS project
+        run: |
+          npx cap add ios
+          npx cap sync ios
 
-      - name: Sync iOS project
-        run: npx cap sync ios
+      - name: Set app name and logo
+        run: |
+          /usr/libexec/PlistBuddy \
+            -c "Set :CFBundleDisplayName سَكينة - تحفيظ القرآن الكريم" \
+            ios/App/App/Info.plist \
+          || /usr/libexec/PlistBuddy \
+            -c "Add :CFBundleDisplayName string سَكينة - تحفيظ القرآن الكريم" \
+            ios/App/App/Info.plist
+
+          if [ -f assets/imgs/app_icon.png ]; then
+            python3 -m pip install --user Pillow
+
+            mkdir -p ios/App/App/Assets.xcassets/AppIcon.appiconset
+
+            python3 - <<'PY'
+          from PIL import Image, ImageOps
+          import json, os
+
+          source = "assets/imgs/app_icon.png"
+          output = "ios/App/App/Assets.xcassets/AppIcon.appiconset"
+          os.makedirs(output, exist_ok=True)
+
+          image = Image.open(source).convert("RGBA")
+          image = ImageOps.fit(image, (1024, 1024), method=Image.Resampling.LANCZOS)
+          image.save(os.path.join(output, "AppIcon.png"))
+
+          contents = {
+              "images": [{
+                  "filename": "AppIcon.png",
+                  "idiom": "universal",
+                  "platform": "ios",
+                  "size": "1024x1024"
+              }],
+              "info": {"author": "xcode", "version": 1}
+          }
+
+          with open(os.path.join(output, "Contents.json"), "w") as f:
+              json.dump(contents, f, ensure_ascii=False, indent=2)
+          PY
+          else
+            echo "ERROR: assets/imgs/app_icon.png not found"
+            exit 1
+          fi
+
+      - name: Install iOS dependencies
+        run: |
+          cd ios/App
+          pod install
 
       - name: Build iOS Simulator app
         run: |
           xcodebuild \
-            -project ios/App/App.xcodeproj \
+            -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             build
 
-      - name: Package simulator app
-        run: |
-          ditto -c -k --sequesterRsrc --keepParent \
-            build/Build/Products/Debug-iphonesimulator/App.app \
-            Sakina-iOS-Simulator.zip
-
-      - name: Upload iOS build
+      - name: Upload simulator build
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Sakina-iOS-Simulator
-          path: Sakina-iOS-Simulator.zip
-          if-no-files-found: error
+          path: build/Build/Products/Debug-iphonesimulator/App.app
